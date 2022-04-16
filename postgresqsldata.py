@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[116]:
+# In[30]:
 
 
 import requests
@@ -33,9 +33,9 @@ for page in degaliniuUrlSarasas:
     for x in range(length):
         #print(degalinesPavadinimas)
         degalinesPavadinimasList.append(degalinesPavadinimas.replace("\n",""))
-    
+        
     degalinesMiestasList = []
-    #print("\nVISI MIESTAI:")
+ #print("\nVISI MIESTAI:")
     results = soup.find_all('span', class_='address')
     length = len(results)
     lengthNum = len(results)
@@ -43,8 +43,14 @@ for page in degaliniuUrlSarasas:
         a = f"{results[x].text}"
         array = a.split()
         miestas = array[-1]
-        #print(miestas)
-        degalinesMiestasList.append(miestas.replace("\n",""))
+        if miestas == "r.":
+            miestas = array[-2]
+            print(miestas)
+            degalinesMiestasList.append(miestas.replace("\n",""))
+        else:
+            miestas = array[-1]
+            print(miestas)
+            degalinesMiestasList.append(miestas.replace("\n",""))
     
 #DABARTINE DIENA
     laikoList = []
@@ -102,7 +108,7 @@ for page in degaliniuUrlSarasas:
     username = 'postgres'
     pwd = '0000'
     port_id=5432
-
+    
     try:
         if(lengthNum != 0):
             print("Prisijungta prie "+database+" duomenu bazes!\n")
@@ -138,18 +144,6 @@ for page in degaliniuUrlSarasas:
             cur.close()
         if conn is not None:
              conn.close()
-
-
-# In[103]:
-
-
-
-
-
-# In[104]:
-
-
-
 
 
 # In[ ]:
