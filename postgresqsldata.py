@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[30]:
+# In[8]:
 
 
 import requests
 page = requests.get('https://www.kuro-kainos.lt/degalu-kainos/circle-k')
 from bs4 import BeautifulSoup
-import psycopg2
+#import psycopg2
 from datetime import date
 import numpy as np
+import mysql.connector
 
 degaliniuUrlSarasas=['https://www.kuro-kainos.lt/degalu-kainos/viada','https://www.kuro-kainos.lt/degalu-kainos/takuras','https://www.kuro-kainos.lt/degalu-kainos/stateta','https://www.kuro-kainos.lt/degalu-kainos/skulas','https://www.kuro-kainos.lt/degalu-kainos/saurida','https://www.kuro-kainos.lt/degalu-kainos/orlen','https://www.kuro-kainos.lt/degalu-kainos/neste','https://www.kuro-kainos.lt/degalu-kainos/jozita','https://www.kuro-kainos.lt/degalu-kainos/emsi','https://www.kuro-kainos.lt/degalu-kainos/ecoil','https://www.kuro-kainos.lt/degalu-kainos/circle-k','https://www.kuro-kainos.lt/degalu-kainos/baltic-petroleum','https://www.kuro-kainos.lt/degalu-kainos/abromika','https://www.kuro-kainos.lt/degalu-kainos/alausa']
 for page in degaliniuUrlSarasas:
@@ -103,16 +104,15 @@ for page in degaliniuUrlSarasas:
         pagrList = newListas.replace('(', '', 1)[::-1].replace(')', '', 1)[::-1].replace("' '","'0.00'").replace("),",")")
         print(pagrList)
 
-    hostname = 'localhost'
-    database = 'postgres'
-    username = 'postgres'
-    pwd = '0000'
-    port_id=5432
+   # hostname = 'localhost'
+    #database = 'postgres'
+    #username = 'postgres'
+   # pwd = '0000'
+   # port_id=5432
     
     try:
         if(lengthNum != 0):
-            print("Prisijungta prie "+database+" duomenu bazes!\n")
-            conn = psycopg2.connect(host = hostname, dbname = database, user = username, password = pwd, port = port_id)
+            conn = mysql.connector.connect(user='root', password='',host='127.0.0.1',database='degalinesdb')
             cur=conn.cursor()
     
         #print(degaliniuAdresaiList)
@@ -120,13 +120,13 @@ for page in degaliniuUrlSarasas:
             listReplaceDGadress = degaliniuAdresaiListToString.replace('[', '(', 1)[::-1].replace(']', ')', 1)[::-1]
         #print(listReplaceDGadress)
     
-            sqlDeleteRows= r'DELETE FROM public."tblDegalinesInfo" WHERE adresas in {0}'.format(listReplaceDGadress)
+            sqlDeleteRows= r'DELETE FROM tbldegalinesinfo WHERE adresas in {0}'.format(listReplaceDGadress)
             cur.execute(sqlDeleteRows,listReplaceDGadress)
             print("Degalines, kurios buvo atnaujintos:\n")
             print(listReplaceDGadress)
     
-            sql = r'INSERT INTO public."tblDegalinesInfo"(miestas, pavadinimas, "adresas", "ikelimoData","benzinoKaina", "dyzelioKaina", "dujuKaina")VALUES  {0}'.format(pagrList)
-            value = [('Test2','Test2','Test2','2022-04-08'),('Test3','Test3','Test3','2022-04-08')] 
+            sql = r'INSERT INTO tbldegalinesinfo (miestas, pavadinimas, adresas,ikelimoData ,benzinoKaina, dyzelioKaina, dujuKaina)VALUES  {0}'.format(pagrList)
+            #value = [('Test2','Test2','Test2','2022-04-08'),('Test3','Test3','Test3','2022-04-08')] 
             cur.execute(sql,pagrList) #value
     
             conn.commit()
