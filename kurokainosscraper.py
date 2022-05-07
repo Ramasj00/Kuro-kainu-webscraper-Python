@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[46]:
+# In[10]:
 
 
 from geopy.geocoders import Nominatim
@@ -15,27 +15,21 @@ degaliniuUrlSarasas=['https://www.kuro-kainos.lt/degalu-kainos/viada','https://w
 for page in degaliniuUrlSarasas:
     a = requests.get(page)
     soup = BeautifulSoup(a.content, 'html.parser')
-
+#ADRESAS
     degaliniuAdresaiList = []
-    #print("\nVISOS DEGALINES:")
-#soup.find_all('div', class_='row days-19')
     degaliniuAdresai = soup.find_all('span', class_='address')
     length = len(degaliniuAdresai)
     for x in range(length):
         adresas = f"{degaliniuAdresai[x].text}"
-        adresasPirmas = f"{degaliniuAdresai[0].text}"
-        #print(adresas)
         degaliniuAdresaiList.append(adresas.replace("\n",""))
     
     degalinesPavadinimasList = []
     degalinesPavadinimas = soup.find_all('b')[0].get_text()
     print("Degalines pavadinimas: "+degalinesPavadinimas)
     for x in range(length):
-        #print(degalinesPavadinimas)
         degalinesPavadinimasList.append(degalinesPavadinimas.replace("\n",""))
-        
+#MIESTAS        
     degalinesMiestasList = []
- #print("\nVISI MIESTAI:")
     results = soup.find_all('span', class_='address')
     length = len(results)
     lengthNum = len(results)
@@ -60,7 +54,6 @@ for page in degaliniuUrlSarasas:
         #print(laikas)
         laikoList.append(laikas.replace("\n",""))
     
-    #print("\nVISOS KAINOS:")
     results = soup.find_all('div', class_='price')
 
     rep=[]
@@ -75,26 +68,14 @@ for page in degaliniuUrlSarasas:
         else: 
             inc=inc+4
     w_train = np.array(rep)
-#print (w_train)
-
     KainuListas = w_train.reshape(lengthNum,3)
-#print(KainuListas)
-
     Kainynas = np.array(KainuListas).tolist()
     print(Kainynas)
     
-    
     finalList = [list(a) for a in zip(degalinesMiestasList,degalinesPavadinimasList,degaliniuAdresaiList,laikoList)]
-#print(finalList)
-
     finaleList = [a + b for a, b in zip(finalList, Kainynas)]
-#print(finaleList)
-
     listass=str(tuple(finaleList))
-#print(listass)
-
     newListas = listass.replace('[','(').replace(']',')')
-#print("newka listas: "+newka)
 
     if lengthNum != 1:
         pagrList = newListas.replace('(', '', 1)[::-1].replace(')', '', 1)[::-1].replace("' '","'0.00'")
@@ -108,10 +89,8 @@ for page in degaliniuUrlSarasas:
             conn = mysql.connector.connect(user='root', password='',host='127.0.0.1',database='degalinesdb')
             cur=conn.cursor()
     
-        #print(degaliniuAdresaiList)
             degaliniuAdresaiListToString = str(degaliniuAdresaiList)
             listReplaceDGadress = degaliniuAdresaiListToString.replace('[', '(', 1)[::-1].replace(']', ')', 1)[::-1]
-        #print(listReplaceDGadress)
     
             sqlDeleteRows= r'DELETE FROM tbldegalinesinfo WHERE adresas in {0}'.format(listReplaceDGadress)
             cur.execute(sqlDeleteRows,listReplaceDGadress)
@@ -130,7 +109,7 @@ for page in degaliniuUrlSarasas:
                 location = geolocator.geocode(address)
                 if address==None or location==None:
                     print(address)
-                    print("NERA TOKIO ADRESO SITA REIKES ISTRINT")
+                    print("NERA TOKIO ADRESO")
                 else:
                     a = address
                     longtitude = location.longitude
